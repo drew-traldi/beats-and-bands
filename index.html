@@ -1,0 +1,63 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maelzel — Metronome</title>
+<meta name="description" content="A beautiful metronome with accents, time signatures, subdivisions and tap tempo.">
+<meta property="og:title" content="Maelzel">
+<meta property="og:description" content="A beautiful metronome with accents, time signatures, subdivisions and tap tempo.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://drew-traldi.github.io/beats-and-bands/">
+<meta name="twitter:card" content="summary">
+<meta name="author" content="Drew Traldi">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20100%20100%27%3E%3Ctext%20y%3D%27.9em%27%20font-size%3D%2790%27%3E%F0%9F%A5%81%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;gap:40px;flex-wrap:wrap;padding:30px 16px;font-family:'Lora',Georgia,serif;color:#f3e3c3;background:#2a1a10 radial-gradient(ellipse at 50% 30%,#4a2f1c,#1a0f08 75%)}
+.metro{width:280px;height:420px;position:relative;filter:drop-shadow(0 30px 30px rgba(0,0,0,.6))}
+.body{position:absolute;inset:0;clip-path:polygon(32% 0,68% 0,100% 100%,0 100%);background:linear-gradient(90deg,#5a3219,#8b5a2b 30%,#a8703a 50%,#8b5a2b 70%,#5a3219);background-image:repeating-linear-gradient(88deg,rgba(0,0,0,.08) 0 2px,transparent 2px 9px),linear-gradient(90deg,#5a3219,#8b5a2b 30%,#b07a42 50%,#8b5a2b 70%,#4a2912)}
+.face{position:absolute;left:36%;right:36%;top:6%;bottom:22%;background:linear-gradient(#efe2c4,#d9c59b);clip-path:polygon(8% 0,92% 0,100% 100%,0 100%);box-shadow:inset 0 0 10px rgba(0,0,0,.4)}
+.face i{position:absolute;left:50%;width:10px;height:1px;background:#6a4a2a;transform:translateX(-50%)}
+.arm{position:absolute;left:calc(50% - 2px);bottom:22%;width:4px;height:68%;background:linear-gradient(#ccc,#888);transform-origin:50% 100%;border-radius:2px}
+.wt{position:absolute;left:50%;width:30px;height:24px;transform:translateX(-50%);background:linear-gradient(90deg,#8a7a50,#e8d8a0,#8a7a50);clip-path:polygon(20% 0,80% 0,100% 100%,0 100%);transition:top .2s}
+.base{position:absolute;left:-4%;right:-4%;bottom:-18px;height:22px;background:linear-gradient(#6b3f1f,#3a2010);border-radius:4px}
+.panel{width:min(420px,100%);text-align:center}
+h1{font-family:'Italiana',serif;font-size:56px;font-weight:400;letter-spacing:6px;color:#f3e3c3}
+.bpm{font-family:'Italiana';font-size:120px;line-height:1;color:#fff;text-shadow:0 0 30px rgba(255,200,120,.3)}
+.it{font-style:italic;color:#d8b77e;font-size:20px;margin-bottom:18px}
+input[type=range]{width:100%;accent-color:#d8a45a}
+.row{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+button{font:600 15px 'Lora';background:transparent;color:#f3e3c3;border:1px solid #d8a45a;padding:10px 16px;border-radius:40px;cursor:pointer}
+button.big{background:#d8a45a;color:#2a1a10;padding:14px 40px;font-size:18px}
+.beats{display:flex;gap:10px;justify-content:center;margin-top:22px}
+.beats span{width:22px;height:22px;border-radius:50%;border:2px solid #d8a45a;cursor:pointer;transition:.08s}
+.beats span.acc{background:rgba(216,164,90,.4)}
+.beats span.on{background:#fff;box-shadow:0 0 16px #ffd;border-color:#fff}
+select{background:transparent;color:#f3e3c3;border:1px solid #d8a45a;border-radius:20px;padding:8px;font:15px 'Lora'}
+select option{background:#2a1a10}
+.hint{margin-top:16px;font-size:13px;color:#a88b64;font-style:italic}
+</style></head><body>
+<div class="metro"><div class="body"></div><div class="face" id="face"></div><div class="arm" id="arm"><div class="wt" id="wt"></div></div><div class="base"></div></div>
+<div class="panel">
+<h1>MAELZEL</h1><div class="bpm" id="bpm">120</div><div class="it" id="tempo">Allegro</div>
+<input type="range" id="r" min="30" max="240" value="120">
+<div class="row"><button id="minus">− 1</button><button class="big" id="play">Play</button><button id="plus">+ 1</button></div>
+<div class="row"><select id="sig"><option value="2">2/4</option><option value="3">3/4</option><option value="4" selected>4/4</option><option value="5">5/4</option><option value="6">6/8</option><option value="7">7/8</option></select>
+<select id="sub"><option value="1">♩ Quarter</option><option value="2">♫ Eighths</option><option value="3">Triplets</option><option value="4">16ths</option></select><button id="tap">Tap tempo</button></div>
+<div class="beats" id="beats"></div>
+<div class="hint">Click a beat dot to toggle its accent · Space = play/stop · ↑↓ = tempo · T = tap</div>
+</div>
+<script>
+const $=id=>document.getElementById(id);let bpm=120,on=false,ac,next=0,beat=0,subI=0,tm,acc=[true,false,false,false],taps=[],dir=1;
+const T=[[40,'Grave'],[60,'Largo'],[66,'Larghetto'],[76,'Adagio'],[108,'Andante'],[120,'Moderato'],[156,'Allegro'],[176,'Vivace'],[200,'Presto'],[999,'Prestissimo']];
+$('face').innerHTML=Array.from({length:12},(_,i)=>`<i style="top:${6+i*7.5}%"></i>`).join('');
+function setB(v){bpm=Math.max(30,Math.min(240,Math.round(v)));$('bpm').textContent=bpm;$('r').value=bpm;$('tempo').textContent=T.find(t=>bpm<t[0])[1];$('wt').style.top=(8+(bpm-30)/210*70)+'%'}
+function beats(){const n=+$('sig').value;acc=Array.from({length:n},(_,i)=>acc[i]??(i===0));acc.length=n;$('beats').innerHTML=acc.map((a,i)=>`<span class="${a?'acc':''}" data-i="${i}"></span>`).join('');$('beats').querySelectorAll('span').forEach(s=>s.onclick=()=>{acc[+s.dataset.i]=!acc[+s.dataset.i];beats()})}
+function click(t,type){const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=type===2?1760:type===1?1100:800;o.type=type===0?'triangle':'square';g.gain.setValueAtTime(type===0?.15:.3,t);g.gain.exponentialRampToValueAtTime(.001,t+.05);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+.06)}
+function sched(){const sub=+$('sub').value,n=acc.length;while(next<ac.currentTime+.12){const isMain=subI===0;click(next,isMain?(acc[beat]?2:1):0);if(isMain){const b=beat,d=next-ac.currentTime;setTimeout(()=>vis(b),Math.max(0,d*1000))}
+  next+=60/bpm/sub;subI++;if(subI>=sub){subI=0;beat=(beat+1)%n}}tm=setTimeout(sched,25)}
+function vis(b){if(!on)return;$('beats').querySelectorAll('span').forEach((s,i)=>s.classList.toggle('on',i===b));dir*=-1;const arm=$('arm');arm.style.transition=`transform ${60/bpm}s cubic-bezier(.45,0,.55,1)`;arm.style.transform=`rotate(${dir*28}deg)`}
+function play(){ac=ac||new AudioContext();ac.resume();if(on){on=false;clearTimeout(tm);$('play').textContent='Play';$('arm').style.transform='rotate(0)';$('beats').querySelectorAll('span').forEach(s=>s.classList.remove('on'));return}on=true;beat=0;subI=0;next=ac.currentTime+.06;$('play').textContent='Stop';sched()}
+$('play').onclick=play;$('r').oninput=()=>setB(+$('r').value);$('minus').onclick=()=>setB(bpm-1);$('plus').onclick=()=>setB(bpm+1);$('sig').onchange=beats;
+$('tap').onclick=()=>{const t=performance.now();taps=taps.filter(x=>t-x<2500);taps.push(t);if(taps.length>1){const d=(taps[taps.length-1]-taps[0])/(taps.length-1);setB(60000/d)}};
+addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();play()}if(e.key==='ArrowUp'){e.preventDefault();setB(bpm+(e.shiftKey?10:1))}if(e.key==='ArrowDown'){e.preventDefault();setB(bpm-(e.shiftKey?10:1))}if(e.key==='t')$('tap').click()});
+setB(120);beats();
+</script></body></html>
