@@ -34,6 +34,8 @@ button.big{background:#d8a45a;color:#2a1a10;padding:14px 40px;font-size:18px}
 select{background:transparent;color:#f3e3c3;border:1px solid #d8a45a;border-radius:20px;padding:8px;font:15px 'Lora'}
 select option{background:#2a1a10}
 .hint{margin-top:16px;font-size:13px;color:#a88b64;font-style:italic}
+/* mobile: 16px fields stop iOS focus-zoom; roomier touch targets */
+@media (max-width:640px){input:not([type=range]):not([type=checkbox]):not([type=radio]):not([type=color]),select,textarea{font-size:16px!important}}
 </style></head><body>
 <div class="metro"><div class="body"></div><div class="face" id="face"></div><div class="arm" id="arm"><div class="wt" id="wt"></div></div><div class="base"></div></div>
 <div class="panel">
